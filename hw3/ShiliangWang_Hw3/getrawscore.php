@@ -1,13 +1,10 @@
 <?php
 
-  echo "hello ";
-  // display errors!
-
   // display errors!
   ini_set('display_errors', 'On');
 
   // grab provided name from form.
-  $param_ssn = $_POST['SSN'];
+  $param_ssn = $_POST['ssn'];
   echo $param_ssn;
 
   // create query
