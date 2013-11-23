@@ -5,14 +5,12 @@
 
   // grab provided name from form.
   $param_ssn = $_POST['ssn'];
-  echo $param_ssn;
 
   // create query
   $query = "call showrawscore(" . $param_ssn . ")";
 
   // Create connection
   $con=mysqli_connect("dbase.cs.jhu.edu","cs41513_yzhan139","VF32AC","cs41513_yzhan139_db");
-  echo $query . "<br>";
 // exec query
   $result = mysqli_query($con,$query);
 
