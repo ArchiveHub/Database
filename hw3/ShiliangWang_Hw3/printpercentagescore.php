@@ -23,7 +23,6 @@
     echo "Failed to connect to MySQL: " . mysql_connect_error();
   }
 
-  if (
 ?>
 
 <html>
@@ -47,6 +46,12 @@
 <?php
   while ($row = mysqli_fetch_array($result))
   {
+    if (array_key_exists("invalid", $row))
+    {
+      echo "Password is not correct";
+      exit;
+    }
+
 ?>
       <tr>
         <td>
