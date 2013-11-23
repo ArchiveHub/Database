@@ -1,0 +1,1104 @@
+--------------
+SELECT 
+    A.Age, concat_ws(" ", A.Fname, A.Lname) as Name, A.major 
+FROM 
+    Student as A 
+join 
+    (SELECT min(Age) as Age, major FROM Student GROUP BY Major) as B 
+on 
+    A.major = B.major and A.Age = B.Age
+--------------
+
++------+---------------+-------+
+| Age  | Name          | major |
++------+---------------+-------+
+|   16 | Susan Lee     |   600 |
+|   17 | Michael Woods |   540 |
+|   18 | Mark Goldman  |   520 |
+|   18 | Paul Brody    |   520 |
+|   17 | Jun Han       |   100 |
+|   18 | William Simms |   550 |
+|   18 | Eric Epp      |    50 |
++------+---------------+-------+
+--------------
+SELECT 
+    DName, min(GPA), concat_ws(" ", Lname, Fname) as Name 
+FROM 
+    (SELECT Student.StuID, CID, Lname, Fname, avg(gradepoint) as GPA, DName FROM Student, Enrolled_in, Gradeconversion, Department 
+WHERE 
+    Student.StuID = Enrolled_in.StuID and Grade = lettergrade and Major = DNO GROUP BY StuId) as A 
+GROUP BY DName
+--------------
+
++-----------------------+--------------------+---------------+
+| DName                 | min(GPA)           | Name          |
++-----------------------+--------------------+---------------+
+| Chemical Engineering  | 3.0875000059604645 | Woods Michael |
+| Cognitive Science     |  2.850000023841858 | Epp Eric      |
+| Computer Science      | 2.6857143129621233 | Smith Linda   |
+| ECE                   |  2.914285727909633 | Thornton Ian  |
+| History               |  3.133333365122477 | Han Jun       |
+| Mathematical Sciences | 2.9571428639548167 | Rugh Eric     |
++-----------------------+--------------------+---------------+
+--------------
+SELECT 
+    Student.StuId, concat_ws(" ", Lname, Fname) as Name, Major, Sex, avg(gradepoint) 
+FROM 
+    Student, Enrolled_in, Gradeconversion WHERE Student.StuId in (SELECT distinct WhoLikes FROM Likes as global 
+WHERE 
+    not exists (SELECT A.StuId FROM (SELECT StuID FROM Course, Enrolled_in WHERE CName like "ALGORITHM%" and Course.CID = Enrolled_in.CID) as A 
+    WHERE 
+        not exists (SELECT WhoLikes FROM Likes as local WHERE local.WhoisLiked = A.StuId and local.WhoLikes = global.WhoLikes))) 
+GROUP BY Student.StuID
+--------------
+
++-------+---------------+-------+------+------------------+
+| StuId | Name          | Major | Sex  | avg(gradepoint)  |
++-------+---------------+-------+------+------------------+
+|  1033 | Simms William |   550 | M    | 2.28461538369839 |
++-------+---------------+-------+------+------------------+
+--------------
+SELECT 
+    CName, Major, Grade, concat_ws(" ", Fname, Lname) as Name 
+FROM 
+    Course, Student, Enrolled_in 
+WHERE 
+    Student.StuId in 
+    (SELECT distinct C.WhoLoves FROM Enrolled_in as A, Enrolled_in as B, Loves as C, Loves as D 
+    WHERE 
+        A.Cid = B.Cid and B.StuId = C.WhoLoves and C.WhoLoves = D.WhoIsLoved and C.WhoIsLoved = D.WhoLoves) and Student.StuID = Enrolled_in.StuID and Enrolled_in.CID = Course.CID
+--------------
+
++-----------------------------------------+-------+-------+----------------+
+| CName                                   | Major | Grade | Name           |
++-----------------------------------------+-------+-------+----------------+
+| NUMERICAL ANALYSIS                      |   600 | A-    | Linda Smith    |
+| SUPERCOMPUTING                          |   600 | B     | Linda Smith    |
+| DATABASE SYSTEMS                        |   600 | B+    | Linda Smith    |
+| DISTRIBUTED SYSTEMS                     |   600 | A     | Linda Smith    |
+| COMPUTER VISION                         |   600 | B-    | Linda Smith    |
+| INTRO TO NATURAL LANGUAGE PROCESSING    |   600 | B     | Linda Smith    |
+| INTRODUCTION TO PROBABILITY             |   600 | B     | Andy Schultz   |
+| INTRO TO PROGRAMMING IN JAVA            |   600 | B+    | Andy Schultz   |
+| DATA STRUCTURES in JAVA                 |   600 | B-    | Andy Schultz   |
+| MULTIMEDIA COMPUTING                    |   600 | C-    | Andy Schultz   |
+| SUPERCOMPUTING                          |   600 | A-    | Andy Schultz   |
+| DATABASE SYSTEMS                        |   600 | A     | Andy Schultz   |
+| DATABASE SYSTEMS                        |   600 | A+    | Jandy Nelson   |
+| ALGORITHMS I                            |   600 | B     | Jandy Nelson   |
+| INTRO TO NATURAL LANGUAGE PROCESSING    |   600 | B     | Jandy Nelson   |
+| HIGH PERFORMANCE GRAPHICS AND MODELING  |   600 | B     | Jandy Nelson   |
+| SEMINAR ON COMPUTATIONAL GEOMETRY       |   600 | B     | Jandy Nelson   |
+| LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |   600 | A     | Derek Lee      |
+| PROBABILITY AND STATISTICS              |   600 | A     | Derek Lee      |
+| APPLIED STATISTICS AND DATA ANALYSIS    |   600 | C+    | Derek Lee      |
+| INTRODUCTION TO PROBABILITY             |   600 | A     | Derek Lee      |
+| COMBINATORIAL ANALYSIS                  |   600 | A     | Derek Lee      |
+| INTRO TO PROGRAMMING IN JAVA            |   600 | B+    | Derek Lee      |
+| MIND, BRAIN, COMPUTERS                  |   600 | B-    | Steven Davis   |
+| COGNITIVE NEUROSCIENCE                  |   600 | B-    | Steven Davis   |
+| SOUND STRUCTURES IN NATURAL LANGUAGE    |   600 | A-    | Steven Davis   |
+| INTRO TO PROGRAMMING IN JAVA            |   600 | A     | Steven Davis   |
+| DATABASE SYSTEMS                        |   600 | B     | Steven Davis   |
+| INTRO TO PROGRAMMING IN JAVA            |   600 | A     | Charles Norris |
+| DATA STRUCTURES in JAVA                 |   600 | A     | Charles Norris |
+| MULTIMEDIA COMPUTING                    |   600 | A     | Charles Norris |
+| DATABASE SYSTEMS                        |   600 | A+    | Charles Norris |
+| QUANTITATIVE MEDICAL COMPUTING          |   600 | B     | Charles Norris |
+| COMPUTER VISION                         |   600 | B     | Charles Norris |
+| ALGORITHMS I                            |   600 | B     | Charles Norris |
+| INTRODUCTION TO PROBABILITY             |   600 | A     | Susan Lee      |
+| DATA STRUCTURES in JAVA                 |   600 | A+    | Susan Lee      |
+| SUPERCOMPUTING                          |   600 | A     | Susan Lee      |
+| DATABASE SYSTEMS                        |   600 | C-    | Susan Lee      |
+| COMPUTER SYSTEM FUNDAMENTALS            |   600 | A     | Susan Lee      |
+| MIND, BRAIN, COMPUTERS                  |   600 | B-    | Mark Schwartz  |
+| COGNITIVE NEUROSCIENCE                  |   600 | D-    | Mark Schwartz  |
+| SOUND STRUCTURES IN NATURAL LANGUAGE    |   600 | A     | Mark Schwartz  |
+| COMP. MODELS OF SENTENCE PROCESSING     |   600 | A     | Mark Schwartz  |
+| INTRODUCTION TO PROBABILITY             |   600 | A-    | Mark Schwartz  |
+| INTRO TO PROGRAMMING IN JAVA            |   600 | B+    | Mark Schwartz  |
+| DATABASE SYSTEMS                        |   600 | B-    | Mark Schwartz  |
+| THE HISTORY OF ROMANCE LANGUAGES        |   600 | B     | Bruce Wilson   |
+| FORMAL METHODS IN COGNITIVE SCIENCE     |   600 | B     | Bruce Wilson   |
+| RESEARCH SEMINAR IN COGNITIVE PROCESSES |   600 | C     | Bruce Wilson   |
+| NUMERICAL ANALYSIS                      |   600 | B     | Bruce Wilson   |
+| INTRO TO PROGRAMMING IN C/C++           |   600 | A-    | Bruce Wilson   |
+| COMPUTER VISION                         |   600 | A     | Bruce Wilson   |
+| INTRO TO NATURAL LANGUAGE PROCESSING    |   600 | C     | Bruce Wilson   |
+| LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |   540 | B     | Stacy Prater   |
+| APPLIED STATISTICS AND DATA ANALYSIS    |   540 | C     | Stacy Prater   |
+| COMBINATORIAL ANALYSIS                  |   540 | A-    | Stacy Prater   |
+| PROBABILITY THEORY I                    |   540 | A     | Stacy Prater   |
+| STOCHASTIC PROCESSES II                 |   540 | B     | Stacy Prater   |
+| COMBINATORIAL ANALYSIS                  |   540 | B     | Stacy Prater   |
+| NUMERICAL ANALYSIS                      |   540 | B     | Stacy Prater   |
+| DATABASE SYSTEMS                        |   540 | B     | Stacy Prater   |
++-----------------------------------------+-------+-------+----------------+
+--------------
+SELECT 
+    Lname, B.times 
+FROM 
+    (SELECT Lname, count(*) as times FROM Student WHERE Sex = 'F' GROUP BY Fname) as B 
+join 
+    (SELECT max(times)as times FROM (SELECT Fname, count(*) as times FROM Student WHERE Sex = 'F' GROUP BY Fname) as A) as C WHERE B.times = C.times
+--------------
+
++-------+-------+
+| Lname | times |
++-------+-------+
+| Apap  |     2 |
+| Smith |     2 |
++-------+-------+
+--------------
+SELECT 
+    StudentA, StudentB, StudentC 
+FROM 
+    (SELECT concat_ws(" ", Student.Fname, Student.Lname) as StudentA, WhoLoves, WhoIsLoved FROM Loves, Student WHERE StuId = WhoLoves) as A, 
+    (SELECT concat_ws(" ", Student.Fname, Student.Lname) as StudentB, WhoLoves, WhoIsLoved FROM Loves, Student WHERE StuId = WhoLoves) as B, 
+    (SELECT concat_ws(" ", Student.Fname, Student.Lname) as StudentC, WhoLoves, WhoIsLoved FROM Loves, Student WHERE StuId = WhoLoves) as C 
+WHERE 
+    A.WhoLoves = B.WhoIsLoved and B.WhoLoves = C.WhoIsLoved and C.WhoLoves = A.WhoisLoved
+--------------
+
++-------------+-------------+-------------+
+| StudentA    | StudentB    | StudentC    |
++-------------+-------------+-------------+
+| Eric Brown  | Paul Brody  | Linda Smith |
+| Paul Brody  | Linda Smith | Eric Brown  |
+| Linda Smith | Eric Brown  | Paul Brody  |
++-------------+-------------+-------------+
+--------------
+SELECT 
+    concat_ws(" ", Lname, Fname) as Name, Student.Age, Student.Major 
+FROM 
+    Student 
+join 
+    (SELECT min(Age) as Age, Major FROM Student GROUP BY Major) as A 
+    on 
+    Student.Age = A.Age and Student.major = A.major
+--------------
+
++---------------+------+-------+
+| Name          | Age  | Major |
++---------------+------+-------+
+| Lee Susan     |   16 |   600 |
+| Woods Michael |   17 |   540 |
+| Goldman Mark  |   18 |   520 |
+| Brody Paul    |   18 |   520 |
+| Han Jun       |   17 |   100 |
+| Simms William |   18 |   550 |
+| Epp Eric      |   18 |    50 |
++---------------+------+-------+
+--------------
+SELECT 
+    Fname, max(times) as times 
+FROM 
+    (SELECT Fname, count(Fname) as times FROM Student WHERE Sex = 'F' GROUP BY Fname) as A
+--------------
+
++-------+-------+
+| Fname | times |
++-------+-------+
+| Jandy |     2 |
++-------+-------+
+--------------
+SELECT 
+    distinct concat_ws(" ", Student.Fname, Student.Lname) as StudentName, Major, concat_ws(" ", Faculty.Fname, Faculty.Lname) 
+FROM 
+    Enrolled_in, Student, Faculty, 
+    (SELECT avg(Age) as Age, CID FROM Student, Enrolled_in WHERE Student.StuID = Enrolled_in.StuID GROUP BY CID) as A 
+WHERE 
+    Student.StuID = Enrolled_in.StuID and Enrolled_in.CID = A.CID and Student.Age < A.Age and Advisor = FacID
+--------------
+
++------------------+-------+----------------------------------------------+
+| StudentName      | Major | concat_ws(" ", Faculty.Fname, Faculty.Lname) |
++------------------+-------+----------------------------------------------+
+| Linda Smith      |   600 | Michael Goodrich                             |
+| Tracy Kim        |   600 | Baruch Awerbuch                              |
+| Dinesh Kumar     |   600 | Subodh Kumar                                 |
+| Andy Schultz     |   600 | Gerald Masson                                |
+| Lisa Apap        |   600 | Yair Amir                                    |
+| Jandy Nelson     |   600 | Rao Kosaraju                                 |
+| Eric Tai         |   600 | David Yarowsky                               |
+| Derek Lee        |   600 | David Yarowsky                               |
+| Charles Norris   |   600 | Steven Salzberg                              |
+| Susan Lee        |   600 | Lawrence Wolff                               |
+| Mark Schwartz    |   600 | David Yarowsky                               |
+| Michael Leighton |   600 | Michael Goodrich                             |
+| Arthur Pang      |   600 | David Yarowsky                               |
+| George Andreou   |   520 | Gert Cauwenberghs                            |
+| Michael Woods    |   540 | Gert Cauwenberghs                            |
+| David Shieber    |   520 | Gert Cauwenberghs                            |
+| Stacy Prater     |   540 | Frederick Jelinek                            |
+| Mark Goldman     |   520 | John Goutsias                                |
+| Eric Pang        |   520 | John Goutsias                                |
+| Paul Brody       |   520 | Andreas Andreou                              |
+| Jun Han          |   100 | Carey Priebe                                 |
+| Sarah Smith      |   550 | Lenore Cowen                                 |
+| William Simms    |   550 | Lenore Cowen                                 |
+| Eric Epp         |    50 | Robert Frank                                 |
+| Sarah Schmidt    |    50 | Robert Frank                                 |
++------------------+-------+----------------------------------------------+
+--------------
+SELECT DNO, count 
+FROM (SELECT DNO, COUNT(*) AS count
+     FROM Minor_in
+     WHERE StuID IN (SELECT StuID
+                     FROM Student
+                     WHERE (Major = 550 OR Major = 600))
+     GROUP BY DNO
+) AS C1
+WHERE count IN (
+               SELECT MAX(count)
+               FROM (
+                     SELECT DNO, COUNT(*) AS count
+                     FROM Minor_in
+                     WHERE StuID IN (SELECT StuID
+                                     FROM Student
+                                     WHERE (Major = 550 OR Major = 600))
+                     GROUP BY DNO
+                     ) AS MinorCount
+               )
+--------------
+
++------+-------+
+| DNO  | count |
++------+-------+
+|  520 |     2 |
+|  550 |     2 |
++------+-------+
+--------------
+SELECT 
+    distinct A.StuID 
+FROM 
+    (SELECT StuID FROM Enrolled_in, Gradeconversion WHERE Grade = lettergrade GROUP BY StuID having avg(gradepoint) > '# 33') as A 
+join 
+    (SELECT StuID FROM Enrolled_in WHERE Grade = 'A') as B on A.StuID = B.StuID
+--------------
+
++-------+
+| StuID |
++-------+
+|  1001 |
+|  1002 |
+|  1004 |
+|  1005 |
+|  1006 |
+|  1007 |
+|  1009 |
+|  1010 |
+|  1011 |
+|  1012 |
+|  1014 |
+|  1015 |
+|  1016 |
+|  1017 |
+|  1018 |
+|  1019 |
+|  1020 |
+|  1021 |
+|  1022 |
+|  1023 |
+|  1024 |
+|  1025 |
+|  1026 |
+|  1028 |
+|  1029 |
+|  1032 |
+|  1033 |
+|  1035 |
++-------+
+--------------
+SELECT 
+    distinct WhoLoves, CName 
+FROM
+    Loves, Course, Enrolled_in 
+WHERE 
+    WhoIsLoved = Enrolled_in.StuID and Enrolled_in.CID = Course.CID 
+order by 
+    WhoLoves
+--------------
+
++----------+-----------------------------------------+
+| WhoLoves | CName                                   |
++----------+-----------------------------------------+
+|     1001 | MULTIMEDIA COMPUTING                    |
+|     1001 | DATABASE SYSTEMS                        |
+|     1001 | QUANTITATIVE MEDICAL COMPUTING          |
+|     1001 | COMPUTER VISION                         |
+|     1001 | INTRO TO PROGRAMMING IN JAVA            |
+|     1001 | ALGORITHMS I                            |
+|     1001 | DATA STRUCTURES in JAVA                 |
+|     1001 | SUPERCOMPUTING                          |
+|     1002 | INTRO TO PROGRAMMING IN JAVA            |
+|     1002 | SUPERCOMPUTING                          |
+|     1002 | EXPLORING THE INTERNET                  |
+|     1002 | INTRODUCTION TO COMPUTER SCIENCE        |
+|     1002 | DATA STRUCTURES in JAVA                 |
+|     1003 | APPLIED STATISTICS AND DATA ANALYSIS    |
+|     1003 | STATISTICAL INFERENCE                   |
+|     1003 | COMBINATORIAL ANALYSIS                  |
+|     1003 | PROBABILITY THEORY I                    |
+|     1003 | STOCHASTIC PROCESSES II                 |
+|     1003 | NUMERICAL ANALYSIS                      |
+|     1003 | FOUNDATIONS OF OPTIMIZATION             |
+|     1005 | THE HISTORY OF ROMANCE LANGUAGES        |
+|     1005 | COMP. MODELS OF SENTENCE PROCESSING     |
+|     1005 | INTRO TO PROGRAMMING IN C/C++           |
+|     1005 | FORMAL METHODS IN COGNITIVE SCIENCE     |
+|     1005 | LANGUAGE DEVELOPMENT                    |
+|     1005 | RESEARCH SEMINAR IN COGNITIVE PROCESSES |
+|     1006 | NUMERICAL ANALYSIS                      |
+|     1006 | INTRO TO NATURAL LANGUAGE PROCESSING    |
+|     1006 | LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |
+|     1006 | HIGH PERFORMANCE GRAPHICS AND MODELING  |
+|     1006 | COMBINATORIAL ANALYSIS                  |
+|     1006 | STOCHASTIC PROCESSES II                 |
+|     1006 | SEMINAR ON COMPUTATIONAL GEOMETRY       |
+|     1006 | DATABASE SYSTEMS                        |
+|     1006 | APPLIED STATISTICS AND DATA ANALYSIS    |
+|     1006 | ALGORITHMS I                            |
+|     1006 | PROBABILITY THEORY I                    |
+|     1007 | CONTROL SYSTEMS                         |
+|     1007 | INTRODUCTION TO PROBABILITY             |
+|     1007 | DATABASE SYSTEMS                        |
+|     1007 | CIRCUITS                                |
+|     1007 | ECE LABORATORY                          |
+|     1007 | MICROPROCESSOR LAB I                    |
+|     1008 | MULTIMEDIA COMPUTING                    |
+|     1008 | SUPERCOMPUTING                          |
+|     1008 | DATABASE SYSTEMS                        |
+|     1008 | INTRODUCTION TO PROBABILITY             |
+|     1008 | INTRO TO PROGRAMMING IN JAVA            |
+|     1008 | DATA STRUCTURES in JAVA                 |
+|     1009 | ECE LABORATORY                          |
+|     1009 | PROBABILITY AND STATISTICS              |
+|     1009 | INTRODUCTION TO PROBABILITY             |
+|     1009 | INTRO TO PROGRAMMING IN JAVA            |
+|     1009 | LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |
+|     1009 | APPLIED STATISTICS AND DATA ANALYSIS    |
+|     1009 | COMBINATORIAL ANALYSIS                  |
+|     1010 | INTRODUCTION TO PROBABILITY             |
+|     1010 | SUPERCOMPUTING                          |
+|     1010 | COMPUTER SYSTEM FUNDAMENTALS            |
+|     1010 | DATA STRUCTURES in JAVA                 |
+|     1010 | DATABASE SYSTEMS                        |
+|     1012 | PROBABILITY THEORY I                    |
+|     1012 | NUMERICAL ANALYSIS                      |
+|     1012 | LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |
+|     1012 | COMBINATORIAL ANALYSIS                  |
+|     1012 | DATABASE SYSTEMS                        |
+|     1012 | STOCHASTIC PROCESSES II                 |
+|     1012 | APPLIED STATISTICS AND DATA ANALYSIS    |
+|     1014 | COMPUTER VISION                         |
+|     1014 | DATABASE SYSTEMS                        |
+|     1014 | INTRO TO NATURAL LANGUAGE PROCESSING    |
+|     1014 | NUMERICAL ANALYSIS                      |
+|     1014 | DISTRIBUTED SYSTEMS                     |
+|     1014 | SUPERCOMPUTING                          |
+|     1015 | COMBINATORIAL ANALYSIS                  |
+|     1015 | INTRO TO PROGRAMMING IN JAVA            |
+|     1015 | LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |
+|     1015 | PROBABILITY AND STATISTICS              |
+|     1015 | APPLIED STATISTICS AND DATA ANALYSIS    |
+|     1015 | INTRODUCTION TO PROBABILITY             |
+|     1016 | INTRO TO NATURAL LANGUAGE PROCESSING    |
+|     1016 | THE HISTORY OF ROMANCE LANGUAGES        |
+|     1016 | FORMAL METHODS IN COGNITIVE SCIENCE     |
+|     1016 | NUMERICAL ANALYSIS                      |
+|     1016 | RESEARCH SEMINAR IN COGNITIVE PROCESSES |
+|     1016 | INTRO TO PROGRAMMING IN C/C++           |
+|     1016 | COMPUTER VISION                         |
+|     1017 | INTRO TO PROGRAMMING IN JAVA            |
+|     1017 | DATABASE SYSTEMS                        |
+|     1017 | MIND, BRAIN, COMPUTERS                  |
+|     1017 | COGNITIVE NEUROSCIENCE                  |
+|     1017 | SOUND STRUCTURES IN NATURAL LANGUAGE    |
+|     1017 | INTRODUCTION TO PROBABILITY             |
+|     1017 | COMP. MODELS OF SENTENCE PROCESSING     |
+|     1019 | INTRODUCTION TO PROBABILITY             |
+|     1019 | SUPERCOMPUTING                          |
+|     1019 | COMPUTER SYSTEM FUNDAMENTALS            |
+|     1019 | DATA STRUCTURES in JAVA                 |
+|     1019 | DATABASE SYSTEMS                        |
+|     1020 | CIRCUITS                                |
+|     1020 | MICROPROCESSOR LAB I                    |
+|     1020 | DISTRIBUTED SYSTEMS                     |
+|     1020 | CONTROL SYSTEMS                         |
+|     1021 | CONTROL SYSTEMS                         |
+|     1021 | CIRCUITS                                |
+|     1021 | MICROPROCESSOR LAB I                    |
+|     1021 | DISTRIBUTED SYSTEMS                     |
+|     1022 | CONTROL SYSTEMS                         |
+|     1022 | CIRCUITS                                |
+|     1022 | MICROPROCESSOR LAB I                    |
+|     1022 | DISTRIBUTED SYSTEMS                     |
+|     1023 | CONTROL SYSTEMS                         |
+|     1023 | CIRCUITS                                |
+|     1023 | MICROPROCESSOR LAB I                    |
+|     1023 | DISTRIBUTED SYSTEMS                     |
+|     1024 | DATA STRUCTURES in JAVA                 |
+|     1024 | COGNITIVE NEUROSCIENCE                  |
+|     1024 | SOUND STRUCTURES IN NATURAL LANGUAGE    |
+|     1024 | INTRO TO PROGRAMMING IN JAVA            |
+|     1024 | SUPERCOMPUTING                          |
+|     1024 | DATABASE SYSTEMS                        |
+|     1024 | EXPLORING THE INTERNET                  |
+|     1024 | MIND, BRAIN, COMPUTERS                  |
+|     1024 | INTRODUCTION TO COMPUTER SCIENCE        |
+|     1025 | MICROPROCESSOR LAB I                    |
+|     1025 | DISTRIBUTED SYSTEMS                     |
+|     1025 | CONTROL SYSTEMS                         |
+|     1025 | CIRCUITS                                |
+|     1026 | DATA STRUCTURES in JAVA                 |
+|     1026 | DATABASE SYSTEMS                        |
+|     1026 | INTRODUCTION TO PROBABILITY             |
+|     1026 | SUPERCOMPUTING                          |
+|     1026 | COMPUTER SYSTEM FUNDAMENTALS            |
+|     1027 | SUPERCOMPUTING                          |
+|     1027 | DATABASE SYSTEMS                        |
+|     1027 | INTRODUCTION TO PROBABILITY             |
+|     1027 | MULTIMEDIA COMPUTING                    |
+|     1028 | APPLIED STATISTICS AND DATA ANALYSIS    |
+|     1028 | PROBABILITY THEORY I                    |
+|     1028 | NUMERICAL ANALYSIS                      |
+|     1028 | LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |
+|     1028 | COMBINATORIAL ANALYSIS                  |
+|     1028 | DATABASE SYSTEMS                        |
+|     1028 | STOCHASTIC PROCESSES II                 |
+|     1029 | APPLIED STATISTICS AND DATA ANALYSIS    |
+|     1029 | COMBINATORIAL ANALYSIS                  |
+|     1029 | ECE LABORATORY                          |
+|     1029 | PROBABILITY AND STATISTICS              |
+|     1029 | INTRODUCTION TO PROBABILITY             |
+|     1029 | INTRO TO PROGRAMMING IN JAVA            |
+|     1029 | LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |
+|     1031 | UNIX SYSTEMS PROGRAMMING                |
+|     1031 | INTRO TO NATURAL LANGUAGE PROCESSING    |
+|     1031 | SUPERCOMPUTING                          |
+|     1031 | DISTRIBUTED SYSTEMS                     |
+|     1031 | CIRCUITS                                |
+|     1031 | ALGORITHMS I                            |
+|     1032 | CIRCUITS                                |
+|     1032 | RESEARCH SEMINAR IN COGNITIVE PROCESSES |
+|     1032 | LINEAR ALGEBRA AND DIFFERENTIAL EQNS    |
+|     1032 | SUPERCOMPUTING                          |
+|     1032 | ALGORITHMS I                            |
+|     1032 | APPLIED STATISTICS AND DATA ANALYSIS    |
+|     1032 | COMPUTER VISION                         |
+|     1032 | THE HISTORY OF ROMANCE LANGUAGES        |
+|     1032 | COMBINATORIAL ANALYSIS                  |
+|     1032 | MICROPROCESSOR LAB I                    |
+|     1032 | UNIX SYSTEMS PROGRAMMING                |
+|     1032 | COMP. MODELS OF SENTENCE PROCESSING     |
+|     1032 | HIGH PERFORMANCE GRAPHICS AND MODELING  |
+|     1032 | DATABASE SYSTEMS                        |
+|     1032 | COMPUTER SYSTEM FUNDAMENTALS            |
+|     1032 | ECE LABORATORY                          |
+|     1032 | INTRO TO NATURAL LANGUAGE PROCESSING    |
+|     1032 | PROBABILITY AND STATISTICS              |
+|     1032 | INTRO TO PROGRAMMING IN C/C++           |
+|     1032 | FORMAL METHODS IN COGNITIVE SCIENCE     |
+|     1032 | NUMERICAL ANALYSIS                      |
+|     1032 | INTRODUCTION TO PROBABILITY             |
+|     1032 | SEMINAR ON COMPUTATIONAL GEOMETRY       |
+|     1032 | CONTROL SYSTEMS                         |
+|     1032 | DISTRIBUTED SYSTEMS                     |
+|     1032 | INTRO TO PROGRAMMING IN JAVA            |
+|     1032 | LANGUAGE DEVELOPMENT                    |
+|     1033 | CIRCUITS                                |
+|     1033 | CONTROL SYSTEMS                         |
+|     1033 | DISTRIBUTED SYSTEMS                     |
+|     1033 | MICROPROCESSOR LAB I                    |
+|     1034 | CIRCUITS                                |
+|     1034 | CONTROL SYSTEMS                         |
+|     1034 | DISTRIBUTED SYSTEMS                     |
+|     1034 | MICROPROCESSOR LAB I                    |
++----------+-----------------------------------------+
+--------------
+SELECT 
+    concat_ws(" ", Fname, Lname) as Name, Age, Major 
+FROM 
+    Student 
+WHERE 
+    StuID not in (SELECT StuID FROM Lives_in)
+--------------
+
++--------------+------+-------+
+| Name         | Age  | Major |
++--------------+------+-------+
+| Andy Schultz |   18 |   600 |
+| Arthur Pang  |   18 |   600 |
+| Eric Pang    |   19 |   520 |
++--------------+------+-------+
+--------------
+SELECT 
+    avg(Age) 
+FROM 
+    Student 
+WHERE 
+    LName in (SELECT LName FROM Faculty)
+--------------
+
++----------+
+| avg(Age) |
++----------+
+|  19.0833 |
++----------+
+--------------
+SELECT 
+    concat_ws(" ", Fname, Lname) as Name, Age, Sex 
+FROM 
+    Course, Enrolled_in, Student 
+WHERE 
+    Course.CID = Enrolled_in.CID and Student.StuID = Enrolled_in.StuID and (Course.CID = '6# 00315' or Course.CID = '6# 00415') and Enrolled_in.StuID in (SELECT StuID FROM Enrolled_in, Course WHERE Course.CID = Enrolled_in.CID and (Course.CID like '6# 001%' or Course.CID like '6# 002%'))
+--------------
+
+--------------
+SELECT 
+    concat_ws(" ", Fname, Lname) as Name, sum(Credits) as totalCredits 
+FROM 
+    Student, Course, Enrolled_in 
+WHERE 
+    Student.StuID = Enrolled_in.StuID and Enrolled_in.CID = Course.CID 
+GROUP BY 
+    Enrolled_in.StuID having totalCredits > (SELECT avg(totalCredits) FROM (SELECT Enrolled_in.StuID, sum(Credits) as totalCredits FROM Course, Enrolled_in WHERE Course.CID = Enrolled_in.CID    GROUP BY Enrolled_in.StuID) as A)
+--------------
+
++----------------+--------------+
+| Name           | totalCredits |
++----------------+--------------+
+| Dinesh Kumar   |           19 |
+| Lisa Apap      |           19 |
+| Eric Tai       |           26 |
+| Derek Lee      |           23 |
+| David Adams    |           20 |
+| Charles Norris |           21 |
+| Mark Schwartz  |           23 |
+| Bruce Wilson   |           19 |
+| George Andreou |           23 |
+| Michael Woods  |           27 |
+| David Shieber  |           24 |
+| Stacy Prater   |           27 |
+| Mark Goldman   |           26 |
+| Paul Brody     |           19 |
+| Jun Han        |           20 |
+| Lisa Cheng     |           26 |
++----------------+--------------+
+--------------
+SELECT 
+    concat_ws(" ", Fname, Lname) as Name, Age 
+FROM 
+    Student 
+WHERE 
+    Age > (SELECT avg(Age) + std(Age) FROM Student)
+--------------
+
++---------------+------+
+| Name          | Age  |
++---------------+------+
+| Paul Gompers  |   26 |
+| Bruce Wilson  |   27 |
+| Sarah Schmidt |   26 |
++---------------+------+
+--------------
+SELECT 
+    concat_ws(" ", Fname, Lname) as Name, Age 
+FROM 
+    Student, Minor_in, Department 
+WHERE 
+    Student.StuID = Minor_in.StuID and Minor_in.DNO = Department.DNO and Sex = 'F' and Division =  'EN' and Advisor in 
+        (SELECT Faculty.FacID FROM Faculty, Member_of, Department WHERE Faculty.FacID = Member_of.FacID and Member_of.DNO = Department.DNO and Sex = 'F' and Department.Division = 'EN' and Appt_Type = 'Primary')
+--------------
+
++-------------+------+
+| Name        | Age  |
++-------------+------+
+| Sarah Smith |   20 |
++-------------+------+
+--------------
+SELECT 
+    concat_ws(" ", Fname, Lname) as Name, Student.StuID 
+FROM 
+    Student 
+WHERE 
+    Student.StuID in 
+    (SELECT 
+        distinct StuID 
+    FROM 
+        Enrolled_in as global 
+    WHERE 
+        not exists ( SELECT CID FROM (SELECT CID FROM Faculty, Course WHERE Faculty.FacID = Course.Instructor and Faculty.Fname = 'Paul' and Faculty.Lname = 'Smolensky') as A 
+        WHERE 
+            not exists (SELECT CID, StuID FROM Enrolled_in as local WHERE local.CID = A.CID and local.StuID = global.StuID)))
+--------------
+
+--------------
+SELECT 
+    concat_ws(" ", Fname, Lname) as Name, Student.StuID 
+FROM 
+    Student, Enrolled_in 
+WHERE 
+    Student.StuID = Enrolled_in.StuID and CID in 
+    (SELECT CID FROM Student, Enrolled_in WHERE Student.StuID = Enrolled_in.StuID and Lname = 'Smith' and Fname = 'Linda')
+--------------
+
++------------------+-------+
+| Name             | StuID |
++------------------+-------+
+| Linda Smith      |  1001 |
+| Linda Smith      |  1001 |
+| Linda Smith      |  1001 |
+| Linda Smith      |  1001 |
+| Linda Smith      |  1001 |
+| Linda Smith      |  1001 |
+| Tracy Kim        |  1002 |
+| Tracy Kim        |  1002 |
+| Tracy Kim        |  1002 |
+| Shiela Jones     |  1003 |
+| Shiela Jones     |  1003 |
+| Shiela Jones     |  1003 |
+| Dinesh Kumar     |  1004 |
+| Dinesh Kumar     |  1004 |
+| Dinesh Kumar     |  1004 |
+| Paul Gompers     |  1005 |
+| Andy Schultz     |  1006 |
+| Andy Schultz     |  1006 |
+| Lisa Apap        |  1007 |
+| Lisa Apap        |  1007 |
+| Jandy Nelson     |  1008 |
+| Eric Tai         |  1009 |
+| Steven Davis     |  1012 |
+| Charles Norris   |  1014 |
+| Charles Norris   |  1014 |
+| Susan Lee        |  1015 |
+| Susan Lee        |  1015 |
+| Mark Schwartz    |  1016 |
+| Bruce Wilson     |  1017 |
+| Bruce Wilson     |  1017 |
+| Bruce Wilson     |  1017 |
+| Michael Leighton |  1018 |
+| Michael Leighton |  1018 |
+| Michael Leighton |  1018 |
+| Arthur Pang      |  1019 |
+| Ian Thornton     |  1020 |
+| Ian Thornton     |  1020 |
+| Ian Thornton     |  1020 |
+| George Andreou   |  1021 |
+| George Andreou   |  1021 |
+| Michael Woods    |  1022 |
+| Michael Woods    |  1022 |
+| Michael Woods    |  1022 |
+| David Shieber    |  1023 |
+| David Shieber    |  1023 |
+| David Shieber    |  1023 |
+| Stacy Prater     |  1024 |
+| Eric Pang        |  1026 |
+| Paul Brody       |  1027 |
+| Paul Brody       |  1027 |
+| Paul Brody       |  1027 |
+| Eric Rugh        |  1028 |
+| Eric Rugh        |  1028 |
+| Eric Brown       |  1032 |
+| Eric Brown       |  1032 |
+| William Simms    |  1033 |
+| William Simms    |  1033 |
+| Eric Epp         |  1034 |
++------------------+-------+
+--------------
+SELECT 
+    avg(Age) 
+FROM 
+    Student 
+WHERE
+    Student.StuID in 
+    (SELECT StuId FROM Participates_in GROUP BY StuID having count(actid) >= '2')
+--------------
+
++----------+
+| avg(Age) |
++----------+
+|  19.4000 |
++----------+
+--------------
+SELECT 
+    distinct concat_ws(" ", B.Fname, B.Lname) as Student1, concat_ws(" ", D.Fname, D.Lname) as Student2 
+FROM 
+    Lives_in as A, Student as B, Lives_in as C, Student as D WHERE A.DormID = C.DormID and A.room_number = C.room_number and A.StuId != C.StuId and B.StuId = A.StuId and D.StuId = C.StuId
+--------------
+
++----------------+----------------+
+| Student1       | Student2       |
++----------------+----------------+
+| Eric Brown     | Linda Smith    |
+| Sarah Smith    | Tracy Kim      |
+| Sarah Schmidt  | Shiela Jones   |
+| Steven Davis   | Paul Gompers   |
+| Eric Tai       | Paul Gompers   |
+| Shiela Jones   | Jandy Nelson   |
+| Susan Lee      | Derek Lee      |
+| Paul Gompers   | Steven Davis   |
+| Eric Tai       | Steven Davis   |
+| Derek Lee      | Susan Lee      |
+| George Andreou | Ian Thornton   |
+| Ian Thornton   | George Andreou |
+| Mark Goldman   | David Shieber  |
+| David Shieber  | Mark Goldman   |
+| Tracy Kim      | Sarah Smith    |
+| Linda Smith    | Eric Brown     |
+| Shiela Jones   | Sarah Schmidt  |
+| Jandy Nelson   | Shiela Jones   |
+| Paul Gompers   | Eric Tai       |
+| Steven Davis   | Eric Tai       |
++----------------+----------------+
+--------------
+insert into Baltimore_distance 
+SELECT 
+    distinct City1_code, City2_code, (A.distance + B.distance) as distance 
+FROM 
+    (SELECT City2_code as City1_code, distance FROM Direct_distance WHERE City1_code = 'BAL') as A, 
+    (SELECT City2_code, distance FROM Direct_distance WHERE City1_code = 'BAL') as B
+--------------
+
+--------------
+INSERT INTO Rectangular_distance
+SELECT 
+    DISTINCT A.city_code, B.city_code, (SQRT(POW(70 * A.latitude - 70 * B.latitude, 2) + POW(70 * A.longitude - 70 * B.longitude, 2))) as distance 
+FROM 
+    City as A, City as B
+--------------
+
+--------------
+INSERT INTO All_distance
+SELECT 
+    A.City1_code, A.City2_code, Direct_distance.distance as direct_distance, baltimore_distance, rectangular_distance 
+FROM 
+    (SELECT 
+        Baltimore_distance.City1_code, Baltimore_distance.City2_code, Baltimore_distance.distance as baltimore_distance, Rectangular_distance.distance as rectangular_distance 
+    FROM 
+        Baltimore_distance, Rectangular_distance 
+    WHERE 
+        Baltimore_distance.City1_code = Rectangular_distance.City1_code and Baltimore_distance.City2_code = Rectangular_distance.City2_code) as A LEFT JOIN Direct_distance on A.City1_code =         Direct_distance.City1_code and A.City2_code = Direct_distance.City2_code
+--------------
+
+--------------
+INSERT INTO Best_distance 
+SELECT 
+    City1_code, City2_code, (IF(direct_distance IS NULL, LEAST(baltimore_distance, rectangular_distance), direct_distance)) as distance 
+FROM 
+    All_distances
+--------------
+
+--------------
+SELECT 
+    CONCAT_WS(" ", Fname, Lname) AS Name, Age, Major 
+FROM 
+    Student 
+WHERE 
+    StuID in 
+    (SELECT
+        A.StuID 
+    FROM 
+        (SELECT Student.StuID, AVG(gradepoint) AS avg FROM Student, Enrolled_in, Gradeconversion WHERE Student.StuID = Enrolled_in.StuID and Grade = lettergrade and CID NOT LIKE CONCAT(Major, '%') GROUP BY Student.StuID) AS A, 
+        (SELECT Student.StuID, AVG(gradepoint) AS avg FROM Student, Enrolled_in, Gradeconversion WHERE Student.StuID = Enrolled_in.StuID and Grade = lettergrade and CID LIKE CONCAT(Major, '%') GROUP BY Student.StuID) AS B WHERE A.StuID = B.StuID and A.avg > B.avg)
+--------------
+
++------------------+------+-------+
+| Name             | Age  | Major |
++------------------+------+-------+
+| Linda Smith      |   18 |   600 |
+| Tracy Kim        |   19 |   600 |
+| Lisa Apap        |   18 |   600 |
+| Derek Lee        |   17 |   600 |
+| David Adams      |   22 |   600 |
+| Susan Lee        |   16 |   600 |
+| Mark Schwartz    |   17 |   600 |
+| Michael Leighton |   20 |   600 |
+| Eric Rugh        |   20 |   550 |
+| Lisa Cheng       |   21 |   550 |
+| Eric Brown       |   20 |   550 |
++------------------+------+-------+
+--------------
+SELECT 
+    DNO, AVG(Count) as Number_students  
+FROM 
+    (SELECT FacID, COUNT(*) AS Count, DNO FROM Student, Member_of WHERE Student.Advisor = Member_of.FacID and Appt_Type = 'Primary' GROUP BY FacID) AS A GROUP BY DNO
+--------------
+
++------+-----------------+
+| DNO  | Number_students |
++------+-----------------+
+|   50 |          2.0000 |
+|  520 |          2.0000 |
+|  550 |          3.0000 |
+|  600 |          1.6364 |
++------+-----------------+
+--------------
+SELECT 
+    MAX(Count) as Count,  Activity_name 
+FROM 
+    (SELECT Activity.actid, Activity_name, COUNT(*) AS Count FROM Activity, Participates_in WHERE Activity.actID = Participates_in.actID GROUP BY Activity.actid) AS A
+--------------
+
++-------+-------------------+
+| Count | Activity_name     |
++-------+-------------------+
+|    14 | Mountain Climbing |
++-------+-------------------+
+--------------
+SELECT 
+    activity_name 
+FROM 
+    Activity 
+WHERE 
+    ActID NOT IN 
+    (SELECT ActID FROM Participates_in) AND ActID IN (SELECT ActID FROM Faculty_Participates_in)
+--------------
+
++----------------+
+| activity_name  |
++----------------+
+| Square Dancing |
++----------------+
+--------------
+SELECT 
+    DISTINCT CONCAT_WS(" ", A_Student.Fname, A_Student.Lname) AS Name1, CONCAT_WS(" ", B_Student.Fname, B_Student.Lname) AS Name2 
+FROM 
+    Lives_in AS A, Student AS A_Student, City AS A_City, Lives_in AS B, Student AS B_Student, City AS B_City 
+WHERE 
+    A.DormID = B.DormID AND A.StuID < B.StuID AND A_Student.StuID = A.StuID AND A_Student.city_code = A_City.city_code AND B_Student.StuID = B.StuID AND B_Student.city_code = B_City.city_code AND A_City.Country != B_City.Country
+--------------
+
++------------------+------------------+
+| Name1            | Name2            |
++------------------+------------------+
+| Paul Gompers     | Jandy Nelson     |
+| Tracy Kim        | Stacy Prater     |
+| Paul Gompers     | Steven Davis     |
+| Eric Tai         | Steven Davis     |
+| Eric Tai         | Michael Leighton |
+| Paul Gompers     | Mark Goldman     |
+| Eric Tai         | Mark Goldman     |
+| Susan Lee        | Mark Goldman     |
+| Bruce Wilson     | Michael Leighton |
+| Eric Tai         | David Adams      |
+| Tracy Kim        | Michael Woods    |
+| Tracy Kim        | Sarah Smith      |
+| Paul Gompers     | Sarah Schmidt    |
+| Eric Tai         | Sarah Schmidt    |
+| Tracy Kim        | Shiela Jones     |
+| Tracy Kim        | Sarah Schmidt    |
+| Susan Lee        | Sarah Schmidt    |
+| Paul Gompers     | Ian Thornton     |
+| Eric Tai         | Ian Thornton     |
+| Paul Gompers     | George Andreou   |
+| Eric Tai         | George Andreou   |
+| Paul Gompers     | David Shieber    |
+| Eric Tai         | David Shieber    |
+| Susan Lee        | Ian Thornton     |
+| Susan Lee        | George Andreou   |
+| Susan Lee        | David Shieber    |
+| Susan Lee        | William Simms    |
+| Eric Tai         | Paul Brody       |
+| Bruce Wilson     | Paul Brody       |
+| Paul Gompers     | Eric Epp         |
+| Eric Tai         | Eric Epp         |
+| Susan Lee        | Eric Epp         |
+| Eric Tai         | Mark Schwartz    |
+| Paul Gompers     | Derek Lee        |
+| Eric Tai         | Derek Lee        |
+| Jandy Nelson     | Eric Tai         |
+| Lisa Apap        | Eric Tai         |
+| Shiela Jones     | Paul Gompers     |
+| Shiela Jones     | Eric Tai         |
+| Dinesh Kumar     | Eric Tai         |
+| Lisa Apap        | Jun Han          |
+| Michael Leighton | Jun Han          |
+| Steven Davis     | Jun Han          |
+| David Adams      | Jun Han          |
+| Paul Brody       | Jun Han          |
+| Mark Schwartz    | Jun Han          |
+| Dinesh Kumar     | Jun Han          |
+| Eric Tai         | Jun Han          |
+| Bruce Wilson     | Jun Han          |
+| Jandy Nelson     | Susan Lee        |
+| Steven Davis     | Susan Lee        |
+| Shiela Jones     | Susan Lee        |
+| Derek Lee        | Susan Lee        |
+| Paul Gompers     | Susan Lee        |
+| Eric Tai         | Susan Lee        |
+| Lisa Apap        | Bruce Wilson     |
+| Steven Davis     | Bruce Wilson     |
+| David Adams      | Bruce Wilson     |
+| Mark Schwartz    | Bruce Wilson     |
+| Dinesh Kumar     | Bruce Wilson     |
+| Eric Tai         | Bruce Wilson     |
++------------------+------------------+
+--------------
+SELECT 
+    Major, COUNT(*) 
+FROM 
+    Student, Participates_in WHERE Student.StuID = Participates_in.StuID 
+GROUP BY 
+    Major
+--------------
+
++-------+----------+
+| Major | COUNT(*) |
++-------+----------+
+|    50 |        7 |
+|   100 |        2 |
+|   520 |        8 |
+|   540 |        5 |
+|   550 |        4 |
+|   600 |       44 |
++-------+----------+
+--------------
+SELECT 
+    DISTINCT CONCAT_WS(" ", Faculty.Fname, Faculty.Lname) AS Name 
+FROM 
+    Student, Member_of, Faculty, 
+    (SELECT 
+        DISTINCT C.StuID2, DNO 
+    FROM 
+        (SELECT 
+            DISTINCT A.StuID AS StuID1, B.StuID AS StuID2 
+        FROM 
+            Enrolled_in AS A, Enrolled_in AS B 
+        WHERE A.CID = B.CID AND A.StuID != B.StuID) AS C, 
+        (SELECT 
+            StuID2, DNO 
+        FROM 
+            (SELECT 
+                DISTINCT A.StuID as StuID1, B.StuID as StuID2 
+            FROM 
+                Lives_in AS A, Lives_in AS B 
+            WHERE 
+                A.StuID != B.StuID AND A.DormID = B.DormID and A.Room_number = B.Room_number
+            ) AS Roommate, 
+            (SELECT 
+                DISTINCT Student.StuID, Member_of.DNO 
+            FROM 
+                Student, Member_of, Minor_in WHERE Major = Member_of.DNO OR (Minor_in.DNO = Member_of.DNO and Student.StuID = Minor_in.StuID)) AS A 
+            WHERE 
+                Roommate.StuID1 = A.StuID
+        ) AS D 
+        WHERE 
+        C.StuID1 = D.StuID2
+    ) AS E 
+    WHERE 
+        Member_of.DNO = E.DNO AND Student.StuID = E.StuID2 AND Student.Advisor = Faculty.FacID
+--------------
+
++-------------------+
+| Name              |
++-------------------+
+| Michael Goodrich  |
+| Baruch Awerbuch   |
+| Eric Brill        |
+| Subodh Kumar      |
+| Gerald Masson     |
+| Yair Amir         |
+| Rao Kosaraju      |
+| David Yarowsky    |
+| Russell Taylor    |
+| Steven Salzberg   |
+| Lawrence Wolff    |
+| Frederick Jelinek |
+| Gert Cauwenberghs |
+| John Goutsias     |
+| Andreas Andreou   |
+| Carey Priebe      |
+| Lenore Cowen      |
+| Robert Frank      |
++-------------------+
+--------------
+SELECT 
+    CONCAT_WS(" ", Student.Fname, Student.Lname) AS Name, SUM(Credits) AS Total_credits 
+FROM 
+    Student, Enrolled_in, Course 
+WHERE 
+    Student.StuID = Enrolled_in.StuID AND Course.CID = Enrolled_in.CID AND Enrolled_in.CID LIKE CONCAT(Major, '%') 
+GROUP BY 
+    Student.StuID HAVING Total_credits > 
+    (SELECT AVG(Credits) AS Avg_credits FROM (SELECT Student.StuID, SUM(Credits) AS Credits FROM Student, Enrolled_in, Course WHERE Student.StuID = Enrolled_in.StuID AND Course.CID = Enrolled_in.CID AND Enrolled_in.CID LIKE CONCAT(Major, '%') GROUP BY Student.StuID) AS A)
+--------------
+
++------------------+---------------+
+| Name             | Total_credits |
++------------------+---------------+
+| Linda Smith      |            13 |
+| Tracy Kim        |            13 |
+| Shiela Jones     |            15 |
+| Dinesh Kumar     |            19 |
+| Paul Gompers     |            11 |
+| Andy Schultz     |            13 |
+| Lisa Apap        |            15 |
+| Jandy Nelson     |            15 |
+| Charles Norris   |            21 |
+| Michael Leighton |            13 |
+| Arthur Pang      |            11 |
+| Lisa Cheng       |            20 |
++------------------+---------------+
+--------------
+SELECT 
+    CName, CONCAT_WS(" ", Faculty.Fname, Faculty.Lname) AS Instructor_name, COUNT(*) AS Num_students 
+FROM 
+    Enrolled_in, Course, Faculty 
+WHERE 
+    Enrolled_in.CID = Course.CID AND Course.Instructor = Faculty.FacID 
+GROUP BY 
+    Enrolled_in.CID 
+HAVING 
+    Num_students > (SELECT AVG(Num_students) FROM (SELECT CID, COUNT(*) AS Num_students FROM Enrolled_in GROUP BY CID) AS A)
+--------------
+
++--------------------------------------+--------------------+--------------+
+| CName                                | Instructor_name    | Num_students |
++--------------------------------------+--------------------+--------------+
+| APPLIED STATISTICS AND DATA ANALYSIS | Daniel Naiman      |            6 |
+| INTRODUCTION TO PROBABILITY          | James Fill         |           13 |
+| COMBINATORIAL ANALYSIS               | Lenore Cowen       |            6 |
+| INTRO TO PROGRAMMING IN JAVA         | Stacey Jones       |           12 |
+| EXPLORING THE INTERNET               | Louis Beach        |            6 |
+| DATA STRUCTURES in JAVA              | Michael Goodrich   |           11 |
+| SUPERCOMPUTING                       | Arthur Delcher     |           14 |
+| DATABASE SYSTEMS                     | David Yarowsky     |           14 |
+| COMPUTER SYSTEM FUNDAMENTALS         | Gerald Masson      |            7 |
+| DISTRIBUTED SYSTEMS                  | Yair Amir          |            9 |
+| DATABASE SYSTEMS                     | David Yarowsky     |            7 |
+| COMPUTER VISION                      | Ellie Angelopoulou |            8 |
+| ALGORITHMS I                         | Baruch Awerbuch    |           11 |
+| INTRO TO NATURAL LANGUAGE PROCESSING | Eric Brill         |            9 |
++--------------------------------------+--------------------+--------------+
+--------------
+SELECT 
+    CONCAT_WS(" ", Fname, Lname) AS Instructor_name, Room, Building 
+FROM 
+    Member_of, Faculty 
+WHERE 
+    Faculty.FacID = Member_of.FacID AND DNO = '600' AND Appt_Type = 'Secondary' AND Building != 'NEB'
+--------------
+
++-------------------+------+----------+
+| Instructor_name   | Room | Building |
++-------------------+------+----------+
+| Michael Brent     | 288  | Krieger  |
+| Frederick Jelinek | 119  | Barton   |
++-------------------+------+----------+
+--------------
+SELECT
+    COUNT(*) AS Count
+FROM 
+    Student, Preferences 
+WHERE 
+    Major = '600' AND Student.StuID = Preferences.StuID AND Student.StuID NOT IN (SELECT WhoLikes FROM Likes) AND Smoking = 'Yes'
+--------------
+
++-------+
+| Count |
++-------+
+|     1 |
++-------+

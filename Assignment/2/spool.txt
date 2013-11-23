@@ -1,0 +1,7 @@
+Create a spool file:
+mysql -h dbase.cs.jhu.edu \
+-u <Your Mysql username> \
+-p  \
+-f -D  <Your mysql DBB> \
+-t -v \
+< MyQueryFile.sql > spool.log
