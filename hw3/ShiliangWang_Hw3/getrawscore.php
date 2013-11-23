@@ -5,7 +5,6 @@
 
   // grab provided name from form.
   $param_ssn = $_POST['ssn'];
-  echo $param_ssn;
 
   // create query
   $query = "call showrawscore(" . $param_ssn . ")";
@@ -27,7 +26,7 @@
   // iterate over results
   while ($row = mysqli_fetch_array($result))
   {
-    echo $row['Fname'] . " " . $row['Lname'] . "<br>";
+    echo $row['FName'] . " " . $row['LName'] . "<br>";
   }
 
   // close connection
