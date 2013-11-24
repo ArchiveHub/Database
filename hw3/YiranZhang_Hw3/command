@@ -1,1 +1,0 @@
-mysql -h dbase.cs.jhu.edu -u cs41513_yzhan139 -p cs41513_yzhan139_db < ~/Downloads/grade.sql

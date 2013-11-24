@@ -1,10 +1,70 @@
 <html>
 <head>
-<title>
-Josh Wheeler
-</title>
-</head>
-<body>
-<b> WELCOME! </b>
-</body>
+  <title>Assignment 3</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+</head>  
+
+  <body>
+    <div id="main">
+      <h1 align="center">Assignemt 3</h1>
+      <p align="center"><em>Author</em></p>
+    </div>
+
+    <div id="main">
+      <div>
+      <h3>(a) Print a student's raw score: </h3>
+        <form action="getrawscore.php" method="post">
+          Please input stduent's SSN:  
+          <input type="text" name="ssn" />
+          <input type="submit" />
+        </form>
+      </div>
+      <div>
+      <h3>(b) Print a single student's percentage scores and weighted average: </h3>
+        <form action="getaveragescore.php" method="post">
+          Please input stduent's SSN:  
+          <input type="text" name="ssn" />
+          <input type="submit" />
+        </form>
+      </div>
+      <div>
+      <h3>(c) Print full raw score: </h3>
+        <form action="getallrawscore.php" method="post">
+          Please input stduent's Password:
+          <input type="password" name="password" />
+          <input type="submit" />
+        </form>
+      </div>
+      <h3>(d) Print a full table of the percentage scores and weighted total: </h3>
+      <div>
+        <form action="printpercentagescore.php" method="post">
+          Please input the password:
+          <input type="password" name="password" />
+          <input type="submit" />
+        </form>
+      </div>
+      <h3>(f) Write a procedure to change student scores:  </h3>
+      <div>
+        <form action="changescores.php" method="post">
+          <table class="mytable">
+            <tr>
+              <td>Password: </td> 
+              <td><input type="password" name="password" /> </td>
+            </tr>
+            <tr>
+              <td>SSN: </td>
+              <td><input type="text" name="ssn" /> </td>
+            </tr>
+            <tr>
+              <td>New Score: </td>
+              <td><input type="text" name="score" /> </td>
+            </tr>
+            <tr>
+              <td><input type="submit" />  </td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+  </body>
 </html>
