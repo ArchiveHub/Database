@@ -4,14 +4,17 @@
   ini_set('display_errors', 'On');
 
   // grab provided name from form. 
+  $param_password = $_POST['password'];
   $param_ssn = $_POST['ssn'];
+  $param_assignmentname = $_POST['assignmentname'];
+  $param_score = $_POST['score'];
 
   // create query 
-  $query = "CALL C('" . $param_ssn . "');";
+  $query = "CALL ChangeScores('" . $param_password . "', '" . $param_ssn . "', '" . $param_assignmentname . "', '" . $param_score . "')";
 
-  if (empty($param_ssn))
+  if (empty($param_ssn) or empty($param_assignmentname) or empty($param_score))
   {
-    echo "You should input a SSN";
+    echo "You should input all the required input";
     exit;
   }
   
