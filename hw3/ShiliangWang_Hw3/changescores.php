@@ -6,15 +6,20 @@
   // grab provided name from form. 
   $param_password = $_POST['password'];
   $param_ssn = $_POST['ssn'];
-  $param_assignmentname = $_POST['assignmentname'];
   $param_score = $_POST['score'];
 
   // create query 
-  $query = "CALL ChangeScores('" . $param_password . "', '" . $param_ssn . "', '" . $param_assignmentname . "', '" . $param_score . "')";
+  $query = "CALL ChangeScores('" . $param_password . "', '" . $param_ssn . "', 'Midterm', '" . $param_score . "')";
 
-  if (empty($param_ssn) or empty($param_assignmentname) or empty($param_score))
+  if (empty($param_ssn) or empty($param_score))
   {
     echo "You should input all the required input";
+    exit;
+  }
+
+  if (!is_numeric($param_score))
+  {
+    echo "The score should be a number";
     exit;
   }
   
@@ -23,7 +28,7 @@
   echo $query . "<br>";
   
   // exec query
-  $result = mysqli_multi_query($con,$query);
+  $result = mysqli_query($con,$query);
 
   // Check connection
   if (mysqli_connect_errno($con))
@@ -31,73 +36,24 @@
     echo "Failed to connect to MySQL: " . mysql_connect_error();
   }
  
-  
-  // iterate over results
-  $result = mysqli_store_result($con);
-  while ($row = mysqli_fetch_array($result))
+  $row = mysqli_fetch_array($result);
+
+  if (array_key_exists("invalid password", $row))
   {
-    #echo $row['SSN'] . " " . $row['HW1'] . " " . $row['HW2a'] . "<br>";
-    $percentage_array = $row;
+    echo "Password is not correct";
+  }
+  else if (array_key_exists("invalid ssn", $row))
+  {
+    echo "Invalid SSN";
+  }
+  else if (array_key_exists("invalid score", $row))
+  {
+    echo "Invalid score";
+  }
+  else 
+  {
+    echo "update sccuess";
   }
 
-  mysqli_next_result($con);
-  $result = mysqli_store_result($con);
-  while ($row = mysqli_fetch_array($result))
-  {
-    #echo $row['FName'] . " " . $row['LName'] . " " . $row['CumAvg'] . "<br>";
-    $weight_array = $row;
-  }
-  // close connection
-  mysqli_close($con);
 ?>
 
-<html>
-  <title>Question (b)</title>
-  <body>
-    <h3>Print a single student's percentage scores and wieghted average</h3>
-    <table border="1">
-      <tr>
-        <th>SSN</th>
-        <th>LName</th>
-        <th>FName</th>
-        <th>HW1</th>
-        <th>HW2a</th>
-        <th>HW2b</th>
-        <th>Midterm</th>
-        <th>HW3</th>
-        <th>FExam</th>
-        <th>CumAvg</th>
-      </tr>
-      <tr>
-        <td>
-        <?php echo $percentage_array['SSN']; ?>
-        </td>
-        <td>
-        <?php echo $weight_array['LName']; ?>
-        </td>
-        <td>
-        <?php echo $weight_array['FName']; ?>
-        </td>
-        <td>
-        <?php echo round($percentage_array['HW1'], 2) . "%"; ?>
-        </td>
-        <td>
-        <?php echo round($percentage_array['HW2a'], 2) . "%"; ?>
-        </td>
-        <td>
-        <?php echo round($percentage_array['HW2b'], 2) . "%"; ?>
-        </td>
-        <td>
-        <?php echo round($percentage_array['Midterm'], 2) . "%"; ?>
-        </td>
-        <td>
-        <?php echo round($percentage_array['HW3'], 2) . "%"; ?>
-        </td>
-        <td>
-        <?php echo round($percentage_array['FExam'], 2) . "%"; ?>
-        </td>
-        <td>
-        <?php echo round($weight_array['CumAvg'], 2) . "%"; ?>
-        </td>
-    </table>
-  </body>
