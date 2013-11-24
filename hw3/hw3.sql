@@ -50,6 +50,7 @@ BEGIN
   IF c = 0
   THEN select "invalid password !";
   ELSE SELECT * from Rawscores
+       WHERE SSN != '0001' and SSN != '0002'
        order by section, Lname, Fname;
   END IF;
   -- use parameter in query
@@ -111,7 +112,7 @@ BEGIN
     SELECT COUNT(*) INTO C FROM Passwords WHERE CurPasswords = password;
 
     IF c = 0
-        THEN SELECT "invalid password!";
+        THEN SELECT "invalid";
     ELSE   
         IF assignmentname = 'HW1'
             THEN UPDATE Rawscores SET HW1 = score WHERE SSN = ssn_number;
