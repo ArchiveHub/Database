@@ -3,6 +3,12 @@ delimiter #
 CREATE PROCEDURE ShowRawScore (IN ssn INTEGER) 
 BEGIN
   -- use parameter in query
-  SELECT * from RAWSCORES r where r.SSN = ssn;
+  declare c INT;
+  select count(*) into c from Rawscores r where  r.SSN = ssn;
+  IF c = 0
+  THEN select "invalid SSN, the student doesn't exists!";
+  ELSE SELECT * from Rawscores r where r.SSN = ssn;
+  END IF;
+
 END#
 delimiter ;
